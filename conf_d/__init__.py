@@ -70,7 +70,7 @@ class Configuration():
 
     def parse(self):
         configs = self._parse_section(path=self._path, defaults=self._main_defaults, parser=self._main_parser, only_section=self._name)
-        self._main_config = configs[self._name]
+        self._main_config = configs.get(self._name)
 
         self._config_sections = self._parse_section(path=self._path, defaults=self._section_defaults, parser=self._section_parser, remove_section=self._name)
         if self._confd_path:
@@ -109,5 +109,11 @@ class Configuration():
                 config = parser(config)
 
             configs[section] = config
+
+        if only_section and len(configs) == 0:
+            if hasattr(parser, '__call__'):
+                configs[only_section] = parser(defaults)
+            else:
+                configs[only_section] = defaults
 
         return configs
