@@ -7,10 +7,11 @@ __version__ = '0.0.2'
 
 class Configuration():
 
-    def __init__(self, name, path, parse=True, confd_path=None, conf_ext=None, main_defaults={}, section_defaults={}, main_parser=None, section_parser=None):
+    def __init__(self, name, path, parse=True, confd_path=None, conf_ext=None, main_defaults={}, section_defaults={}, main_parser=None, section_parser=None, path_from_main=None):
         self._conf_ext = conf_ext
         self._config_sections = {}
         self._confd_path = confd_path
+        self._path_from_main = path_from_main
         self._main_config = {}
         self._main_defaults = main_defaults
         self._main_parser = main_parser
@@ -73,8 +74,20 @@ class Configuration():
         self._main_config = configs.get(self._name)
 
         self._config_sections = self._parse_section(path=self._path, defaults=self._section_defaults, parser=self._section_parser, remove_section=self._name)
+
+        if self._path_from_main:
+            self._confd_path = self._main_config.get(self._path_from_main, self._confd_path)
+
         if self._confd_path:
-            for f in sorted(os.listdir(self._confd_path)):
+            try:
+                paths = os.listdir(self._confd_path)
+            except OSError:
+                paths = None
+
+            if not paths:
+                return
+
+            for f in sorted(paths):
                 path = os.path.realpath(os.path.join(self._confd_path, f))
                 if not os.path.isfile(path):
                     continue
