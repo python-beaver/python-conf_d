@@ -20,7 +20,7 @@ From Github::
 
 From PyPI::
 
-    pip install conf_d==0.0.2
+    pip install conf_d==0.0.3
 
 Usage
 =====
