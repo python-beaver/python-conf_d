@@ -52,10 +52,13 @@ class GlobSafeConfigParser(ConfigParser.RawConfigParser):
             # a section header or option header?
             else:
                 # is it a section header?
-                firstBrace = line.find('[') + 1
-                lastBrace = line.rfind(']')
-                if firstBrace != -1 and lastBrace != -1 and line.strip().find('[') == 0:
-                    sectname = line[firstBrace:lastBrace]
+                try:
+                  value = line[:line.index(';')].strip()
+                except ValueError: #no semicolon so no comments to strip off
+                  value = line.strip()
+
+                if  value[0]=='[' and value[-1]==']' and len(value)>2:
+                    sectname = value[1:-1]
                     if sectname in self._sections:
                         cursect = self._sections[sectname]
                     elif sectname == "DEFAULT":
