@@ -1,9 +1,105 @@
 # -*- coding: utf-8 -*-
 import ConfigParser
 import os
+import re
 
 __version__ = '0.0.3'
 
+class GlobSafeConfigParser(ConfigParser.RawConfigParser):
+
+    OPTCRE = re.compile(
+        r'(?P<option>[^:=\s][^:=]*)' # very permissive!
+        r'\s*(?P<vi>[:=])\s*'        # any number of space/tab,
+                                     # followed by separator
+                                     # (either : or =), followed
+                                     # by any # space/tab
+        r'(?P<value>.*)$'            # everything up to eol
+        )
+
+    def _read(self, fp, fpname):
+        """Parse a sectioned setup file.
+
+        The sections in setup file contains a title line at the top,
+        indicated by a name in square brackets (`[]'), plus key/value
+        options lines, indicated by `name: value' format lines.
+        Continuations are represented by an embedded newline then
+        leading whitespace. Blank lines, lines beginning with a '#',
+        and just about everything else are ignored.
+
+        Copied from python 2.7 source and modified so that globs in
+        sections work properly for beaver
+        """
+        cursect = None # None, or a dictionary
+        optname = None
+        lineno = 0
+        e = None # None, or an exception
+        while True:
+            line = fp.readline()
+            if not line:
+                break
+            lineno = lineno + 1
+            # comment or blank line?
+            if line.strip() == '' or line[0] in '#;':
+                continue
+            if line.split(None, 1)[0].lower() == 'rem' and line[0] in "rR":
+                # no leading whitespace
+                continue
+            # continuation line?
+            if line[0].isspace() and cursect is not None and optname:
+                value = line.strip()
+                if value:
+                    cursect[optname] = "%s\n%s" % (cursect[optname], value)
+            # a section header or option header?
+            else:
+                # is it a section header?
+                try:
+                  value = line[:line.index(';')].strip()
+                except ValueError: #no semicolon so no comments to strip off
+                  value = line.strip()
+
+                if  value[0]=='[' and value[-1]==']' and len(value)>2:
+                    sectname = value[1:-1]
+                    if sectname in self._sections:
+                        cursect = self._sections[sectname]
+                    elif sectname == "DEFAULT":
+                        cursect = self._defaults
+                    else:
+                        cursect = self._dict()
+                        cursect['__name__'] = sectname
+                        self._sections[sectname] = cursect
+                    # So sections can't start with a continuation line
+                    optname = None
+                # no section header in the file?
+                elif cursect is None:
+                    raise MissingSectionHeaderError(fpname, lineno, line)
+                # an option line?
+                else:
+                    mo = self.OPTCRE.match(line)
+                    if mo:
+                        optname, vi, optval = mo.group('option', 'vi', 'value')
+                        if vi in ('=', ':') and ';' in optval:
+                            # ';' is a comment delimiter only if it follows
+                            # a spacing character
+                            pos = optval.find(';')
+                            if pos != -1 and optval[pos-1].isspace():
+                                optval = optval[:pos]
+                        optval = optval.strip()
+                        # allow empty values
+                        if optval == '""':
+                            optval = ''
+                        optname = self.optionxform(optname.rstrip())
+                        cursect[optname] = optval
+                    else:
+                        # a non-fatal parsing error occurred. set up the
+                        # exception but keep going. the exception will be
+                        # raised at the end of the file and will contain a
+                        # list of all bogus lines
+                        if not e:
+                            e = ParsingError(fpname)
+                        e.append(lineno, repr(line))
+        # if any parsing errors occurred, raise an exception
+        if e:
+            raise e
 
 class Configuration():
 
@@ -99,7 +195,7 @@ class Configuration():
                 self._config_sections.update(configs)
 
     def _parse_section(self, path, defaults={}, parser=None, only_section=None, remove_section=None):
-        config_parser = ConfigParser.ConfigParser(defaults)
+        config_parser = GlobSafeConfigParser(defaults)
 
         if not path:
             raise IOError('No path specified: "%s"' % path)
