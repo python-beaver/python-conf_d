@@ -26,23 +26,23 @@ class ConfigurationTests(unittest.TestCase):
 
         expected = {}
         actual = conf._parse_section(path='./data/empty.ini')
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {'section': {'key': 'value'}}
         actual = conf._parse_section(path='./data/single_section.ini')
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {'section': {'key': 'value', 'key_two': 'other_value'}}
         actual = conf._parse_section(path='./data/single_section.ini', defaults={'key_two': 'other_value'})
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {'section': {'key': 'value', 'key_two': 'other_value'}}
         actual = conf._parse_section(path='./data/single_section.ini', defaults={'key_two': 'other_value'}, only_section='section')
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {}
         actual = conf._parse_section(path='./data/single_section.ini', defaults={'key_two': 'other_value'}, remove_section='section')
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {
             'derp': {'cats': '1', 'expected': 'the spanish inquisition', 'no': 'sleep', 'til': 'brooklyn'},
@@ -54,7 +54,7 @@ class ConfigurationTests(unittest.TestCase):
             'expected': 'the spanish inquisition',
             'cats': '1',
         })
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {
             'multiple_sections': {'cats': '1', 'expected': 'the spanish inquisition', 'no': 'one'},
@@ -64,7 +64,7 @@ class ConfigurationTests(unittest.TestCase):
             'expected': 'the spanish inquisition',
             'cats': '1',
         })
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
         expected = {
             'multiple_sections': {'cats': '1', 'expected': 'the spanish inquisition', 'no': 'one'},
@@ -75,7 +75,7 @@ class ConfigurationTests(unittest.TestCase):
             'expected': 'the spanish inquisition',
             'cats': '1',
         })
-        self.assertDictEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_get(self):
         conf = Configuration(
