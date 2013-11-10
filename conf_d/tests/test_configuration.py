@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+import ConfigParser
 import unittest
 
 from conf_d import Configuration
 
+class TestConfigParser(ConfigParser.ConfigParser):
+    def read(self, path):
+        raise NotImplementedError('Catch this')
 
 class ConfigurationTests(unittest.TestCase):
 
@@ -358,6 +362,16 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(True, conf.get('multiple_sections', 'main_key'))
         self.assertEqual(None, conf.get('derp', 'missing_key'))
         self.assertEqual(1, conf.get('another/conf', 'sleep'))
+
+    def test_custom_config_parser(self):
+        conf = Configuration(
+            name='multiple_sections',
+            path='./data/multiple_sections.ini',
+            config_parser=TestConfigParser,
+            parse=False
+        )
+
+        self.assertRaises(NotImplementedError, lambda: conf._parse_section(path='./data/multiple_sections.ini'))
 
     def test_readme(self):
         def digitize(config):
