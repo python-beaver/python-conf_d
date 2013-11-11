@@ -7,7 +7,7 @@ __version__ = '0.0.3'
 
 class Configuration():
 
-    def __init__(self, name, path, parse=True, confd_path=None, conf_ext=None, main_defaults={}, section_defaults={}, main_parser=None, section_parser=None, path_from_main=None):
+    def __init__(self, name, path, parse=True, confd_path=None, conf_ext=None, main_defaults={}, section_defaults={}, main_parser=None, section_parser=None, path_from_main=None, config_parser=ConfigParser.ConfigParser):
         self._conf_ext = conf_ext
         self._config_sections = {}
         self._confd_path = confd_path
@@ -19,6 +19,7 @@ class Configuration():
         self._path = path
         self._section_defaults = section_defaults
         self._section_parser = section_parser
+        self._config_parser = config_parser
 
         if self._conf_ext:
             self._conf_ext = '.' + conf_ext.strip(".")
@@ -99,7 +100,7 @@ class Configuration():
                 self._config_sections.update(configs)
 
     def _parse_section(self, path, defaults={}, parser=None, only_section=None, remove_section=None):
-        config_parser = ConfigParser.ConfigParser(defaults)
+        config_parser = self._config_parser(defaults)
 
         if not path:
             raise IOError('No path specified: "%s"' % path)
