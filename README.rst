@@ -7,7 +7,7 @@ read configuration files, conf.d style
 Requirements
 ============
 
-* Python 2.6+
+* Python 2.6+ or Python 3.4+
 
 Installation
 ============
@@ -20,7 +20,7 @@ From Github::
 
 From PyPI::
 
-    pip install conf_d==0.0.3
+    pip install conf_d==0.0.5
 
 Usage
 =====
