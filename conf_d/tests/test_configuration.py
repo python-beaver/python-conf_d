@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import ConfigParser
 import unittest
 
 from conf_d import Configuration
+from conf_d.compat import ConfigParser
 
-class TestConfigParser(ConfigParser.ConfigParser):
+
+class TestConfigParser(ConfigParser):
     def read(self, path):
         raise NotImplementedError('Catch this')
 

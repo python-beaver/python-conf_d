@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-import ConfigParser
 import os
 
-__version__ = '0.0.4'
+from conf_d.compat import ConfigParser
+
+__version__ = '0.0.5'
 
 
 class Configuration():
 
-    def __init__(self, name, path, parse=True, confd_path=None, conf_ext=None, main_defaults={}, section_defaults={}, main_parser=None, section_parser=None, path_from_main=None, config_parser=ConfigParser.ConfigParser):
+    def __init__(self, name, path, parse=True, confd_path=None, conf_ext=None, main_defaults={}, section_defaults={}, main_parser=None, section_parser=None, path_from_main=None, config_parser=ConfigParser):
         self._conf_ext = conf_ext
         self._config_sections = {}
         self._confd_path = confd_path

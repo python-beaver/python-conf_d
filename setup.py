@@ -33,6 +33,10 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     description='read configuration files, conf.d style',
     long_description=open('README.rst').read() + '\n\n' +
