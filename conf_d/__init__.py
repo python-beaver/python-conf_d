@@ -3,7 +3,7 @@ import os
 
 from conf_d.compat import ConfigParser
 
-__version__ = '0.0.5'
+__version__ = '0.1.0'
 
 
 class Configuration():
